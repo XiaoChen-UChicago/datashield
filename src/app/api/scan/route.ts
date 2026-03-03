@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       inputLength: body.text.length,
       detectionCount: detections.length,
       elapsedMs: elapsed,
-      report: detections as unknown,
+      report: JSON.parse(JSON.stringify(detections)) as any,
     },
   });
 
