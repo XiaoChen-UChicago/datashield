@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { prismaStrategy, runDetection, normalizeStrategy } from "@/lib/detector";
 import { prisma } from "@/lib/prisma";
 import { verifyApiKey } from "@/lib/api-keys";
