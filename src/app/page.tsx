@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+
+
 import { Workspace } from "@/components/workspace";
 import { prisma } from "@/lib/prisma";
 import { DetectionReportItem } from "@/components/workspace";
