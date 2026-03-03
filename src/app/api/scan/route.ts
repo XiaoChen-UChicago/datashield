@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import type { Prisma } from "@prisma/client/runtime/library";
 import { prismaStrategy, runDetection, normalizeStrategy } from "@/lib/detector";
 import { prisma } from "@/lib/prisma";
 import { verifyApiKey } from "@/lib/api-keys";
