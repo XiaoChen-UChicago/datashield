@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum ProtectionStrategy {
+  MASK
+  ENCRYPT
+  TOKENIZE
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+model Workspace {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  memberships Membership[]
+  apiKeys     ApiKey[]
+  events      DetectionEvent[]
+  tokens      TokenRecord[]
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  passwordHash String
+  name         String?
+  role         UserRole      @default(MEMBER)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  memberships  Membership[]
+  apiKeys      ApiKey[]
+  events       DetectionEvent[]
+}
+
+model Membership {
+  id          String    @id @default(cuid())
+  userId      String
+  workspaceId String
+  role        UserRole  @default(MEMBER)
+  createdAt   DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+}
+
+model ApiKey {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  userId       String?
+  name         String
+  keyHash      String    @unique
+  lastUsedAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model DetectionEvent {
+  id             String             @id @default(cuid())
+  workspaceId    String?
+  userId         String?
+  createdAt      DateTime           @default(now())
+  strategy       ProtectionStrategy
+  inputLength    Int
+  detectionCount Int
+  elapsedMs      Int
+  report         Json
+
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model TokenRecord {
+  id           String   @id @default(cuid())
+  workspaceId  String?
+  token        String   @unique
+  originalHash String   @unique
+  payload      Bytes
+  createdAt    DateTime @default(now())
+  lastUsedAt   DateTime @default(now())
+
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+}
